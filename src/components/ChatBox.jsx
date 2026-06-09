@@ -33,31 +33,26 @@ function Chat() {
   };
 
   useEffect(() => {
-  const handleMessage = (data) => {
-    if (data.userEmail === email) {
-      setMessages((prev) => {
-  const exists = prev.some(
-    (msg) =>
-      msg.message === data.message &&
-      msg.sender === data.sender
-  );
+  socket.off("receive_message");
 
-  if (exists) return prev;
+  socket.on("receive_message", (data) => {
+    setMessages((prev) => {
+      const exists = prev.some(
+        (msg) =>
+          msg.message === data.message &&
+          msg.sender === data.sender
+      );
 
-  return [...prev, data];
-});
-    }
-  };
+      if (exists) return prev;
 
-  socket.on("receive_message", handleMessage);
+      return [...prev, data];
+    });
+  });
 
   return () => {
-    socket.off(
-      "receive_message",
-      handleMessage
-    );
+    socket.off("receive_message");
   };
-}, [email]);
+}, []);
 
   const handleStart = async () => {
     if (!name || !email) {
