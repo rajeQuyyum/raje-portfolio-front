@@ -2,7 +2,10 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import io from "socket.io-client";
 
-const socket = io(import.meta.env.VITE_API_URL);
+const socket = io(import.meta.env.VITE_API_URL, {
+  transports: ["websocket", "polling"],
+  withCredentials: true,
+});
 
 function Chat() {
   const [started, setStarted] = useState(false);
