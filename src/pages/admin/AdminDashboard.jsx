@@ -4,10 +4,12 @@ import axios from "axios";
 import io from "socket.io-client";
 
 const socket = io(import.meta.env.VITE_API_URL, {
-  transports: ["websocket", "polling"],
+  transports: ["websocket"],
+  reconnection: true,
+  reconnectionAttempts: Infinity,
+  reconnectionDelay: 1000,
   withCredentials: true,
 });
-
 
 
 function AdminDashboard() {
