@@ -13,7 +13,7 @@ function Projects() {
       "React • Node.js • MongoDB",
 
     liveDemo:
-      "https://yourwebsite.com",
+      "https://raje-portfolio-front.vercel.app/chat",
   },
 
   {
@@ -65,7 +65,7 @@ function Projects() {
       "React • Tailwind CSS",
 
     liveDemo:
-      "https://yourwebsite.com",
+      "https://raje-portfolio-front.vercel.app",
   },
 
   {
