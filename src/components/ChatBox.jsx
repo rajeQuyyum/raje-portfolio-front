@@ -244,7 +244,7 @@ function Chat() {
 
                       </div>
 
-                      <p className="text-sm leading-relaxed break-words">
+                      <p className="text-sm leading-relaxed wrap-break-word">
                         {msg.message}
                       </p>
 

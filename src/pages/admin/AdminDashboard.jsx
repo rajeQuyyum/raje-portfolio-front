@@ -347,7 +347,7 @@ function AdminDashboard() {
 
                   <div className="flex items-start justify-between gap-3">
 
-                    <p className="text-sm w-full break-words">
+                    <p className="text-sm w-full wrap-break-word">
                       {msg.message}
                     </p>
 
