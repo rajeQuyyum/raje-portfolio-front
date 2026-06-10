@@ -22,10 +22,10 @@ function Navbar() {
 </div>
 
         <div className="hidden md:flex gap-6">
-          <Link to="/">Home</Link>
-          <Link to="/about">About</Link>
+          <Link to="/"></Link>
           <Link to="/projects">Projects</Link>
           <Link to="/services">Services</Link>
+          <Link to="/about">About</Link>
         </div>
 
         <button
@@ -38,9 +38,10 @@ function Navbar() {
 
       {open && (
         <div className="md:hidden flex flex-col gap-4 mt-4 px-4">
-          <Link to="/">Home</Link>
+          <Link to="/"></Link>
+           <Link to="/projects">Projects</Link>
+          <Link to="/services">Services</Link>
           <Link to="/about">About</Link>
-          <Link to="/chat">Chat</Link>
         </div>
       )}
     </nav>

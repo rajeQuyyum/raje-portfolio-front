@@ -1,5 +1,6 @@
 import React from 'react'
 import logo from "../assets/logo.png";
+import { Link } from 'react-router-dom';
 
 export default function Footer() {
   return (
@@ -40,23 +41,23 @@ export default function Footer() {
         Quick Links
       </h3>
 
-      <div className="space-y-3 text-gray-400">
+      <div className="flex flex-col gap-3 text-gray-400">
 
-        <p className="hover:text-white transition cursor-pointer">
+        <Link to="/" className="hover:text-white transition cursor-pointer">
           Home
-        </p>
+        </Link>
 
-        <p className="hover:text-white transition cursor-pointer">
+        <Link to="/projects" className="hover:text-white transition cursor-pointer">
           Projects
-        </p>
+        </Link>
 
-        <p className="hover:text-white transition cursor-pointer">
+        <Link to="/services" className="hover:text-white transition cursor-pointer">
           Services
-        </p>
+        </Link>
 
-        <p className="hover:text-white transition cursor-pointer">
-          Contact
-        </p>
+        <Link to="/chat" className="hover:text-white transition cursor-pointer">
+          Chat
+        </Link>
 
       </div>
 

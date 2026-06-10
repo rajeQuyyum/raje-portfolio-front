@@ -11,7 +11,6 @@ const socket = io(import.meta.env.VITE_API_URL, {
   withCredentials: true,
 });
 
-
 function AdminDashboard() {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] =
@@ -29,38 +28,40 @@ function AdminDashboard() {
 
   const logout = () => {
     localStorage.removeItem("adminToken");
-
     navigate("/admin/login");
   };
 
   useEffect(() => {
-  fetchUsers();
+    fetchUsers();
 
-  socket.off("receive_message");
-
-  socket.on("receive_message", (data) => {
-    setMessages((prev) => {
-      const exists = prev.some(
-        (msg) =>
-          msg.message === data.message &&
-          msg.sender === data.sender
-      );
-
-      if (exists) return prev;
-
-      return [...prev, data];
-    });
-  });
-
-  return () => {
     socket.off("receive_message");
-  };
-}, []);
+
+    socket.on("receive_message", (data) => {
+      if (
+        data.userEmail === selectedUser
+      ) {
+        setMessages((prev) => {
+          const exists = prev.some(
+            (msg) =>
+              msg._id === data._id
+          );
+
+          if (exists) return prev;
+
+          return [...prev, data];
+        });
+      }
+    });
+
+    return () => {
+      socket.off("receive_message");
+    };
+  }, [selectedUser]);
 
   const fetchUsers = async () => {
     try {
       const res = await axios.get(
-       `${import.meta.env.VITE_API_URL}/api/admin/users`,
+        `${import.meta.env.VITE_API_URL}/api/admin/users`,
         {
           headers: {
             authorization: token,
@@ -97,13 +98,7 @@ function AdminDashboard() {
     if (!reply.trim()) return;
 
     try {
-      const data = {
-        userEmail: selectedUser,
-        sender: "admin",
-        message: reply,
-      };
-
-      await axios.post(
+      const res = await axios.post(
         `${import.meta.env.VITE_API_URL}/api/admin/reply`,
         {
           userEmail: selectedUser,
@@ -116,12 +111,10 @@ function AdminDashboard() {
         }
       );
 
-      socket.emit("send_message", data);
-
-      setMessages((prev) => [
-        ...prev,
-        data,
-      ]);
+      socket.emit(
+        "send_message",
+        res.data
+      );
 
       setReply("");
     } catch (error) {
@@ -129,73 +122,69 @@ function AdminDashboard() {
     }
   };
 
-
   const clearChat = async () => {
-  try {
-    await axios.delete(
-      `${import.meta.env.VITE_API_URL}/api/admin/clear-chat/${selectedUser}`,
-      {
-        headers: {
-          authorization: token,
-        },
-      }
-    );
+    try {
+      await axios.delete(
+        `${import.meta.env.VITE_API_URL}/api/admin/clear-chat/${selectedUser}`,
+        {
+          headers: {
+            authorization: token,
+          },
+        }
+      );
 
-    setMessages([]);
-  } catch (error) {
-    console.log(error);
-  }
-};
+      setMessages([]);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
+  const deleteUser = async () => {
+    try {
+      await axios.delete(
+        `${import.meta.env.VITE_API_URL}/api/admin/delete-user/${selectedUser}`,
+        {
+          headers: {
+            authorization: token,
+          },
+        }
+      );
 
+      setUsers((prev) =>
+        prev.filter(
+          (user) =>
+            user.email !== selectedUser
+        )
+      );
 
-const deleteUser = async () => {
-  try {
-    await axios.delete(
-      `${import.meta.env.VITE_API_URL}/api/admin/delete-user/${selectedUser}`,
-      {
-        headers: {
-          authorization: token,
-        },
-      }
-    );
+      setSelectedUser(null);
+      setMessages([]);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-    setUsers((prev) =>
-      prev.filter(
-        (user) =>
-          user.email !== selectedUser
-      )
-    );
+  const deleteMessage = async (id) => {
+    try {
+      await axios.delete(
+        `${import.meta.env.VITE_API_URL}/api/admin/delete-message/${id}`,
+        {
+          headers: {
+            authorization: token,
+          },
+        }
+      );
 
-    setSelectedUser(null);
+      setMessages((prev) =>
+        prev.filter(
+          (msg) => msg._id !== id
+        )
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-    setMessages([]);
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-
-const deleteMessage = async (id) => {
-  try {
-    await axios.delete(
-      `${import.meta.env.VITE_API_URL}/api/admin/delete-message/${id}`,
-      {
-        headers: {
-          authorization: token,
-        },
-      }
-    );
-
-    setMessages((prev) =>
-      prev.filter(
-        (msg) => msg._id !== id
-      )
-    );
-  } catch (error) {
-    console.log(error);
-  }
-};
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col md:flex-row">
 
@@ -292,21 +281,21 @@ const deleteMessage = async (id) => {
 
               <div className="flex gap-2 mt-2 flex-wrap">
 
-  <button
-    onClick={clearChat}
-    className="bg-white text-black text-xs px-3 py-1 rounded-lg"
-  >
-    Clear Chat
-  </button>
+                <button
+                  onClick={clearChat}
+                  className="bg-white text-black text-xs px-3 py-1 rounded-lg"
+                >
+                  Clear Chat
+                </button>
 
-  <button
-    onClick={deleteUser}
-    className="bg-red-700 text-white text-xs px-3 py-1 rounded-lg"
-  >
-    Delete User
-  </button>
+                <button
+                  onClick={deleteUser}
+                  className="bg-red-700 text-white text-xs px-3 py-1 rounded-lg"
+                >
+                  Delete User
+                </button>
 
-</div>
+              </div>
             </div>
           </div>
 
@@ -319,9 +308,9 @@ const deleteMessage = async (id) => {
               </div>
             )}
 
-            {messages.map((msg, index) => (
+            {messages.map((msg) => (
               <div
-                key={index}
+                key={msg._id}
                 className={`mb-4 flex ${
                   msg.sender === "admin"
                     ? "justify-end"
@@ -343,7 +332,9 @@ const deleteMessage = async (id) => {
                     </span>
 
                     <span className="text-[10px] opacity-60">
-                      {new Date().toLocaleTimeString(
+                      {new Date(
+                        msg.createdAt
+                      ).toLocaleTimeString(
                         [],
                         {
                           hour: "2-digit",
@@ -356,18 +347,22 @@ const deleteMessage = async (id) => {
 
                   <div className="flex items-start justify-between gap-3">
 
-  <p className="text-sm w-full wrap-break-word">
-    {msg.message}
-  </p>
+                    <p className="text-sm w-full break-words">
+                      {msg.message}
+                    </p>
 
-  <button
-    onClick={() => deleteMessage(msg._id)}
-    className="text-red-400 hover:text-red-600 text-xs"
-  >
-    X
-  </button>
+                    <button
+                      onClick={() =>
+                        deleteMessage(
+                          msg._id
+                        )
+                      }
+                      className="text-red-400 hover:text-red-600 text-xs"
+                    >
+                      X
+                    </button>
 
-</div>
+                  </div>
 
                 </div>
               </div>
@@ -386,7 +381,9 @@ const deleteMessage = async (id) => {
                   placeholder="Type message..."
                   value={reply}
                   onChange={(e) =>
-                    setReply(e.target.value)
+                    setReply(
+                      e.target.value
+                    )
                   }
                   className="flex-1 border p-3 rounded-xl outline-none focus:ring-2 focus:ring-black"
                 />
