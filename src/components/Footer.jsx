@@ -96,8 +96,8 @@ export default function Footer() {
         <p>Email: qtech@gmail.com</p>
 
         <p>Phone: +234 816 956 8398</p>
-        <a
-  href="https://wa.me/2348169568398"
+       <a
+  href="https://wa.me/2348169568398?text=Hello%20i%20need%20Website%20/%20App%3F"
   target="_blank"
   rel="noopener noreferrer"
   className="hover:text-white transition"
